@@ -1,4 +1,3 @@
--- Editor functions and management of editor buffers
 local M = {}
 local api = vim.api
 local anki_connect = require("anki.connect")
@@ -6,7 +5,6 @@ local editor_class = require("anki.editor_class")
 local deck_info = require("anki.deck_info")
 local models = require("anki.models")
 local utils = require("anki.utils")
--- TODO: Quand on ferme un buffer, le supprimer d'ici
 M.editors = {}
 
 local function current_editor()

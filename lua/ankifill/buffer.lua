@@ -1,9 +1,6 @@
 local api = vim.api
 local API = require("ankifill.api")
 local Utils = require("ankifill.utils")
-local Path = require("plenary.path") -- Require plenary for file handling
-local scan = require("plenary.scandir") -- For directory scanning
-local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
 Buffer = {}
 Buffer.bufopts = {
   modifiable = true,
@@ -70,7 +67,7 @@ Buffer.AddKeymap = function(deck, model, fields)
   api.nvim_set_keymap(
     "n",
     "<S-s>",
-    "<Cmd>lua require('anki').Buffer.Save('" .. vim.fn.json_encode(params) .. "')<CR>",
+    "<Cmd>lua require('ankifill').Buffer.Save('" .. vim.fn.json_encode(params) .. "')<CR>",
     {}
   )
 
@@ -78,7 +75,7 @@ Buffer.AddKeymap = function(deck, model, fields)
   api.nvim_set_keymap(
     "n",
     "<S-r>",
-    "<Cmd>lua require('anki').Buffer.Change_Model('" .. vim.fn.json_encode(params) .. "')<CR>",
+    "<Cmd>lua require('ankifill').Buffer.Change_Model('" .. vim.fn.json_encode(params) .. "')<CR>",
     {}
   )
 
@@ -86,18 +83,18 @@ Buffer.AddKeymap = function(deck, model, fields)
   api.nvim_set_keymap(
     "n",
     "<S-g>",
-    "<Cmd>lua require('anki').Buffer.SendGui('" .. vim.fn.json_encode(params) .. "')<CR>",
+    "<Cmd>lua require('ankifill').Buffer.SendGui('" .. vim.fn.json_encode(params) .. "')<CR>",
     {}
   )
 
   -- Triggered by <S-g>
-  api.nvim_set_keymap("n", "<S-p>", "<Cmd>lua require('anki').Buffer.SelectImage()<CR>", {})
+  api.nvim_set_keymap("n", "<S-p>", "<Cmd>lua require('ankifill').Select.SelectImage()<CR>", {})
 
   -- Triggered by <S-g>
   api.nvim_set_keymap(
     "n",
     "<S-o>",
-    "<Cmd>lua require('anki').Buffer.guiDeckOverview('" .. vim.fn.json_encode(params) .. "')<CR>",
+    "<Cmd>lua require('ankifill').Buffer.guiDeckOverview('" .. vim.fn.json_encode(params) .. "')<CR>",
     {}
   )
 end
@@ -150,35 +147,6 @@ end
 
 Buffer.PasteText = function(text)
   vim.api.nvim_put({ text }, "l", true, true)
-end
-
-Buffer.SelectImage = function()
-  local images = scan.scan_dir(image_dir, { only_dirs = false, depth = 1 })
-  local image_files = {}
-
-  for _, file in ipairs(images) do
-    if file:match("%.jpg$") or file:match("%.png$") or file:match("%.jpeg$") then
-      table.insert(image_files, Path:new(file):make_relative(image_dir)) -- Use relative paths
-    end
-  end
-
-  if #image_files == 0 then
-    print("No images found in the directory: " .. image_dir)
-    return
-  end
-
-  vim.ui.select(image_files, {
-    prompt = "choose an image:",
-  }, function(choice)
-    if choice then
-      local image_path = Path:new(image_dir, choice):absolute() -- Convert relative path to absolute
-      local image_reference = string.format('<div style="text-align: center;"><img src="%s"></div>', choice)
-      API.SendImagetoAnki(choice, image_path)
-      Buffer.PasteText(image_reference)
-      Buffer.PasteText(image_path)
-      Buffer.PasteText(choice)
-    end
-  end)
 end
 
 return Buffer

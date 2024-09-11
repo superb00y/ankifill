@@ -4,7 +4,6 @@ local URL = "localhost:8765"
 
 local API = {}
 
--- ### Post #######################################################################
 API.Post = function(body)
   body = vim.fn.json_encode(body)
 
@@ -18,27 +17,22 @@ API.Post = function(body)
   return result.result or {}
 end
 
--- ### Get Deck Names #############################################################
 API.GetDeckNames = function()
   return API.Post({ action = "deckNames", version = 6 })
 end
 
--- ### Create Deck ################################################################
 API.CreateDeck = function(deck_name)
   return API.Post({ action = "createDeck", version = 6, params = { deck = deck_name } })
 end
 
--- ### Get Model Names ############################################################
 API.GetModelNames = function()
   return API.Post({ action = "modelNames", version = 6 })
 end
 
--- ### Get Model Field Names ######################################################
 API.GetModelFieldNames = function(model_name)
   return API.Post({ action = "modelFieldNames", version = 6, params = { modelName = model_name } })
 end
 
--- ### Add Card ###################################################################
 API.AddCard = function(deck_name, model_name, fields)
   local body = {
     action = "addNote",
@@ -63,7 +57,6 @@ API.AddCard = function(deck_name, model_name, fields)
   return API.Post(body)
 end
 
--- ### Send card to Addqui ###################################################################
 API.guiAddCard = function(deck_name, model_name, fields)
   local body = {
     action = "guiAddCards",

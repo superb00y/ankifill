@@ -11,7 +11,9 @@ Ankifill is a Neovim plugin that allows you to create and manage Anki cards dire
 
 ## Installation
 
-Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
+Add the following to your Neovim configuration:
+
+### Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
 
 ```lua
 use {
@@ -35,9 +37,7 @@ use {
 }
 ```
 
-### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
-
-Add the following to your Neovim configuration:
+### Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {

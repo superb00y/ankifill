@@ -1,12 +1,24 @@
 local API = require("ankifill.api")
 local Select = require("ankifill.select")
-local config = require("ankifill.config")
-local api = vim.api
 local M = {}
 
+M.defaults = {
+  anki_connect_url = "http://localhost:8765",
+  default_deck = "Default",
+  image_dir = "/home/youq-chan/Pictures/Screenshots",
+  default_model = "Basic",
+  code_formatters = {},
+}
+
 function M.setup(opts)
-  config.set(opts)
-  api.nvim_create_user_command("Anki", M.run, {})
+  M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
+end
+
+function M.getconfig(key)
+  if key then
+    return M.options[key]
+  end
+  return M.options
 end
 
 function M.run(type)
