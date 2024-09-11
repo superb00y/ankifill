@@ -1,5 +1,5 @@
-local API = require("api")
-local Buffer = require("buffer")
+local API = require("ankifill.api")
+local Buffer = require("ankifill.buffer")
 
 Select = {}
 -- selects a deck or adds a new one --> callback Anki.SelectModel

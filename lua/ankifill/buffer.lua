@@ -1,6 +1,6 @@
 local api = vim.api
-local API = require("api")
-local Utils = require("utils")
+local API = require("ankifill.api")
+local Utils = require("ankifill.utils")
 local Path = require("plenary.path") -- Require plenary for file handling
 local scan = require("plenary.scandir") -- For directory scanning
 local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
