@@ -12,10 +12,9 @@ M.config = {
 -- Setup function
 function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
-  api.nvim_create_user_command("Anki", M.run(), {})
+  api.nvim_create_user_command("anki", M.run(), {})
 end
 
--- ### Entry Point ################################################################
 function M.run(type)
   local deck_names = API.GetDeckNames()
   local model_names = API.GetModelNames()
