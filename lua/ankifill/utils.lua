@@ -1,4 +1,4 @@
-local Code = require("code")
+local Code = require("ankifill.code")
 local Utils = {}
 
 Utils.GetFieldsFromBuff = function(fields)

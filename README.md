@@ -34,3 +34,31 @@ use {
   }
 }
 ```
+
+### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+Add the following to your Neovim configuration:
+
+```lua
+{
+  "yourusername/ankifill.nvim",
+  dependencies = { "nvim-lua/plenary.nvim" },
+  config = function()
+    require("ankifill").setup({
+      anki_connect_url = "http://localhost:8765",
+      default_deck = "My Default Deck",
+      default_model = "Basic (and reversed card)",
+      code_formatters = {
+        lua = function(code)
+          -- Add Lua formatting logic here
+          return code
+        end,
+        python = function(code)
+          -- Add Python formatting logic here
+          return code
+        end,
+      }
+    })
+  end,
+}
+```
