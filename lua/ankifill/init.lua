@@ -1,5 +1,5 @@
 local API = require("ankifill.api")
-local Select = require("ankifill.select")
+local editor = require("ankifill.editor")
 local M = {}
 
 M.defaults = {
@@ -10,8 +10,9 @@ M.defaults = {
   code_formatters = {},
 }
 
-function M.setup(opts)
-  M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
+function M.setup(user_config)
+  user_config = user_config or {}
+  M.options = vim.tbl_deep_extend("force", {}, M.defaults, user_config)
 end
 
 function M.getconfig(key)
@@ -21,11 +22,40 @@ function M.getconfig(key)
   return M.options
 end
 
-function M.run(type)
+function M.run()
   local deck_names = API.GetDeckNames()
-  local model_names = API.GetModelNames()
   deck_names[#deck_names + 1] = "Add Deck"
-  Select.SelectDeck(deck_names, model_names, type)
+  local model_names = API.GetModelNames()
+  vim.ui.select(deck_names, {
+    prompt = "Choose a deck:",
+  }, function(deck)
+    if deck == "Add Deck" then
+      vim.ui.input({
+        prompt = "Enter deck name:",
+      }, function(name)
+        if name then
+          API.CreateDeck(name)
+          vim.ui.select(model_names, {
+            prompt = "Choose a model:",
+          }, function(model)
+            if model then
+              editor.add_note(model, name)
+            end
+          end)
+        end
+      end)
+    else
+      if deck then
+        vim.ui.select(model_names, {
+          prompt = "Choose a model:",
+        }, function(model)
+          if model then
+            editor.add_note(model, deck)
+          end
+        end)
+      end
+    end
+  end)
 end
 
 return M

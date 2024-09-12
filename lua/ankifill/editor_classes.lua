@@ -1,8 +1,8 @@
 local M = {}
 local api = vim.api
 local cmd = vim.cmd
-local info = require("anki.deck_info")
-local models = require("anki.models")
+local API = require("ankifill.api")
+local models = require("ankifill.models")
 local id = 0
 local Editor = {}
 
@@ -32,6 +32,7 @@ end
 local function mk_win(field, properties, row)
   local ui = api.nvim_list_uis()[1]
   local buf = create_buf()
+
   local borderchars = properties.borderchars
   properties.relative = "editor"
   properties.height = math.floor(ui.height * properties.height - 2 - 1)
@@ -63,12 +64,15 @@ local function mk_win(field, properties, row)
   local len = half - 2 - (math.floor(string.len(field) / 2))
 
   local len2 = len
+
   if opts.width % 2 ~= 0 then
     len2 = len2 + 1
   end
+
   if string.len(field) % 2 ~= 0 then
     len2 = len2 - 1
   end
+
   local top_border = {
     borderchars[1]
       .. string.rep(borderchars[2], len)
@@ -78,12 +82,15 @@ local function mk_win(field, properties, row)
       .. string.rep(borderchars[2], len2)
       .. borderchars[3],
   }
+
   local bottom_border = {
     borderchars[7] .. string.rep(borderchars[6], opts.width - 2) .. borderchars[5],
   }
+
   local middle_border = {
     borderchars[8] .. string.rep(" ", opts.width - 2) .. borderchars[4],
   }
+
   api.nvim_buf_set_lines(border_buf, 0, 0, false, top_border)
   for i = 1, opts.height - 2 do
     api.nvim_buf_set_lines(border_buf, i, i, true, middle_border)
@@ -97,24 +104,15 @@ local function mk_win(field, properties, row)
 end
 
 function Editor:new(model_name, deck)
-  if not model_name then
-    api.nvim_err_writeln("Missing argument 'model' !")
-    return
-  end
-  if not models.model_exists(model_name) then
-    api.nvim_err_writeln("Unknown model '" .. model_name .. "' !")
-    return
-  end
-  if deck and not info.deck_exists(deck) then
-    api.nvim_err_writeln("Unknown deck '" .. deck .. "' !")
-    return
-  end
-  model = models.get_models()[model_name]
+  local model = {}
+  model.name = model_name
+  model.model_fields = API.GetModelFieldNames(model_name)
+  model.editor_fields, model.editor_fields_order = models.defaut_editor_conf(model.model_fields)
 
   local row = 1
-
   cmd("set winhighlight=Normal:MyNormal")
   local fields = {}
+  fields.Deck = deck
   for _, field in ipairs(model.editor_fields_order) do
     local properties = model.editor_fields[field]
     local buf, win, border_buf, border_win = mk_win(field, properties, row)
@@ -126,6 +124,7 @@ function Editor:new(model_name, deck)
       border_win = border_win,
     }
   end
+
   local current_field = model.editor_fields_order[1]
   if deck and fields.Deck then
     api.nvim_buf_set_lines(fields.Deck.buf, 0, -1, true, { deck })
@@ -133,6 +132,7 @@ function Editor:new(model_name, deck)
       current_field = model.editor_fields_order[2]
     end
   end
+
   api.nvim_set_current_win(fields[current_field].win)
 
   local this = { id = id, fields = fields, model = model }
