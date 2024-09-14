@@ -30,11 +30,11 @@ function M.write()
     return
   end
   local model = e:get_model()
+  local deck = model.deck
   local fields = e:get_fields_contents()
   local fields_order = model.editor_fields_order
-  local deck = fields.Deck
 
-  if fields[fields_order[2]] == nil or fields[fields_order[2]] == "" then
+  if fields[fields_order[1]] == nil or fields[fields_order[1]] == "" then
     api.nvim_err_writeln("1st field is empty !")
     return
   end
@@ -43,8 +43,34 @@ function M.write()
   API.AddCard(deck, model.name, fields)
 end
 
+function M.sendtogui()
+  local e = current_editor()
+  if not e then
+    return
+  end
+  local model = e:get_model()
+  local fields = e:get_fields_contents()
+  local fields_order = model.editor_fields_order
+
+  if fields[fields_order[1]] == nil or fields[fields_order[1]] == "" then
+    api.nvim_err_writeln("1st field is empty !")
+    return
+  end
+
+  API.guiAddCard(model.deck, model.name, fields)
+end
+
 function M.pasteimage()
   select.SelectImage()
+end
+
+function M.guiDeckOverview()
+  local e = current_editor()
+  local deck
+  if e then
+    deck = e:get_model().deck
+    API.guiDeckOveriew(deck)
+  end
 end
 
 function M.next_field()

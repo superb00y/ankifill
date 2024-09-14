@@ -8,7 +8,7 @@ local Editor = {}
 
 Editor.__index = Editor
 Editor.bufopts = {
-  swapfile = true,
+  swapfile = false,
   buftype = "nofile",
   modifiable = true,
   filetype = "html",
@@ -29,17 +29,32 @@ local function create_buf()
   return buf
 end
 
-local function mk_win(properties, row)
+local function mk_header(deck)
+  local ui = api.nvim_list_uis()[1]
+  local buf = api.nvim_create_buf(true, true)
+  api.nvim_set_option_value("buftype", "nofile", { buf = buf })
+  api.nvim_buf_set_lines(buf, 0, -1, true, { " ● Deck:" .. deck })
+  api.nvim_set_option_value("modifiable", false, { buf = buf })
+  api.nvim_buf_attach(buf, false, {})
+  local properties = {
+    relative = "editor",
+    style = "minimal",
+    border = "single",
+    height = 1,
+    width = math.floor(ui.width - 2),
+    row = 1,
+    col = 1,
+  }
+  local win = api.nvim_open_win(buf, true, properties)
+  cmd("autocmd WinClosed <buffer=" .. buf .. '> lua require"ankifill.editor".delete_editor(' .. id .. ")")
+  return buf, win
+end
+
+local function mk_field(properties, row)
   local ui = api.nvim_list_uis()[1]
   local buf = create_buf()
   properties.height = math.floor(ui.height * properties.height - 2)
-  if properties.height <= 0 then
-    properties.height = 1
-  end
   properties.width = math.floor(ui.width * properties.width - 2)
-  if properties.width <= 0 then
-    properties.width = 1
-  end
   properties.row = row
   properties.col = 1
   local win = api.nvim_open_win(buf, true, properties)
@@ -49,32 +64,28 @@ end
 
 function Editor:new(model_name, deck)
   local model = {}
+  model.deck = deck
   model.name = model_name
   model.model_fields = API.GetModelFieldNames(model_name)
   model.editor_fields, model.editor_fields_order = models.editor_conf(model.model_fields)
-  local row = 1
   local fields = {}
+  local head_buf, head_win = mk_header(deck)
+  fields["header"] = {
+    buf = head_buf,
+    win = head_win,
+  }
+  local row = 4
   for _, field in ipairs(model.editor_fields_order) do
     local properties = model.editor_fields[field]
-    local buf, win = mk_win(properties, row)
+    local buf, win = mk_field(properties, row)
     row = row + properties.height + 2
     fields[field] = {
       buf = buf,
       win = win,
     }
   end
-
   local current_field = model.editor_fields_order[1]
-
-  if deck and fields.Deck then
-    api.nvim_buf_set_lines(fields.Deck.buf, 0, -1, true, { deck })
-    if model.editor_fields_order[1] == "Deck" then
-      current_field = model.editor_fields_order[2]
-    end
-  end
-
   api.nvim_set_current_win(fields[current_field].win)
-
   local this = { id = id, fields = fields, model = model }
   id = id + 1
   setmetatable(this, self)

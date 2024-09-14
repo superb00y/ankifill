@@ -2,15 +2,7 @@ local M = {}
 local utils = require("ankifill.utils")
 
 M.editor_conf = function(fields)
-  local editor_fields = {
-    Deck = {
-      relative = "editor",
-      border = "double",
-      title = " ● Deck:",
-      height = 0.1,
-      width = 1,
-    },
-  }
+  local editor_fields = {}
   for _, field in pairs(fields) do
     editor_fields[field] = {
       relative = "editor",
@@ -20,8 +12,8 @@ M.editor_conf = function(fields)
       width = 1,
     }
   end
+
   local editor_fields_order = utils.table_copy(fields)
-  table.insert(editor_fields_order, 1, "Deck")
   return editor_fields, editor_fields_order
 end
 

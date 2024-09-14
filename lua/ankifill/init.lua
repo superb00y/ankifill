@@ -7,16 +7,6 @@ local M = {}
 function M.setup(user_config)
   user_config = user_config or {}
   config.set(user_config)
-
-  api.nvim_create_user_command("EditorNext", 'lua require("ankifill.editor").next_field()', {})
-  api.nvim_create_user_command("EditorProv", 'lua require("ankifill.editor").prev_field()', {})
-  api.nvim_create_user_command("EditorWrit", 'lua require("ankifill.editor").write()', {})
-
-  api.nvim_set_keymap("n", "<S-k>", '<Cmd>lua require("ankifill.editor").prev_field()<CR>', {})
-  api.nvim_set_keymap("n", "<S-j>", '<Cmd>lua require("ankifill.editor").next_field()<CR>', {})
-  api.nvim_set_keymap("n", "<S-s>", '<Cmd>lua require("ankifill.editor").write()<CR>', {})
-
-  api.nvim_set_keymap("n", "<S-i>", '<Cmd>lua require("ankifill.editor").pasteimage()<CR>', {})
 end
 
 function M.run()
@@ -53,6 +43,14 @@ function M.run()
       end
     end
   end)
+
+  api.nvim_set_keymap("n", "<S-k>", '<Cmd>lua require("ankifill.editor").prev_field()<CR>', {})
+  api.nvim_set_keymap("n", "<S-j>", '<Cmd>lua require("ankifill.editor").next_field()<CR>', {})
+  api.nvim_set_keymap("n", "<S-s>", '<Cmd>lua require("ankifill.editor").write()<CR>', {})
+
+  api.nvim_set_keymap("n", "<S-i>", '<Cmd>lua require("ankifill.editor").pasteimage()<CR>', {})
+  api.nvim_set_keymap("n", "<S-g>", '<Cmd>lua require("ankifill.editor").sendtogui()<CR>', {})
+  api.nvim_set_keymap("n", "<S-o>", '<Cmd>lua require("ankifill.editor").guiDeckOverview()<CR>', {})
 end
 
 return M
