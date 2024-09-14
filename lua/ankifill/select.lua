@@ -1,42 +1,42 @@
-local API = require("ankifill.api")
--- local Buffer = require("ankifill.buffer")
-local scan = require("plenary.scandir") -- For directory scanning
-local Path = require("plenary.path") -- Require plenary for file handling
-local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
-
-Select = {}
-
-Select.SelectDeck = function(deck_names, model_names)
-  vim.ui.select(deck_names, {
-    prompt = "Choose a deck:",
-  }, function(choice)
-    if choice == "Add Deck" then
-      vim.ui.input({
-        prompt = "Enter deck name:",
-      }, function(name)
-        if name then
-          API.CreateDeck(name)
-          Select.SelectModel(name, model_names)
-        end
-      end)
-    else
-      if choice then
-        Select.SelectModel(choice, model_names)
-      end
-    end
-  end)
-end
-
--- selects a model --> callback Buffer.OpenWindow (opens the model window)
-Select.SelectModel = function(deck, model_names)
-  vim.ui.select(model_names, {
-    prompt = "Choose a model:",
-  }, function(choice)
-    if choice then
-      editor.add_note(choice, deck)
-    end
-  end)
-end
+-- local API = require("ankifill.api")
+-- -- local Buffer = require("ankifill.buffer")
+-- local scan = require("plenary.scandir") -- For directory scanning
+-- local Path = require("plenary.path") -- Require plenary for file handling
+-- local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
+--
+-- Select = {}
+--
+-- Select.SelectDeck = function(deck_names, model_names)
+--   vim.ui.select(deck_names, {
+--     prompt = "Choose a deck:",
+--   }, function(choice)
+--     if choice == "Add Deck" then
+--       vim.ui.input({
+--         prompt = "Enter deck name:",
+--       }, function(name)
+--         if name then
+--           API.CreateDeck(name)
+--           Select.SelectModel(name, model_names)
+--         end
+--       end)
+--     else
+--       if choice then
+--         Select.SelectModel(choice, model_names)
+--       end
+--     end
+--   end)
+-- end
+--
+-- -- selects a model --> callback Buffer.OpenWindow (opens the model window)
+-- Select.SelectModel = function(deck, model_names)
+--   vim.ui.select(model_names, {
+--     prompt = "Choose a model:",
+--   }, function(choice)
+--     if choice then
+--       editor.add_note(choice, deck)
+--     end
+--   end)
+-- end
 
 -- Select.SelectImage = function()
 --   local images = scan.scan_dir(image_dir, { only_dirs = false, depth = 1 })

@@ -1,9 +1,11 @@
 local M = {}
 
 M.defaults = {
-  anki_connect_url = "http://localhost:8765",
   default_deck = "Default",
   default_model = "Basic",
+  image_dir = "/home/youq-chan/Pictures/Screenshots",
+  image_formating = {},
+  text_formating = {},
   code_formatters = {},
 }
 

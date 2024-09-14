@@ -2,7 +2,7 @@ local M = {}
 local api = vim.api
 local cmd = vim.cmd
 local API = require("ankifill.api")
-local models = require("ankifill.models")
+local models = require("ankifill.fields")
 local id = 0
 local Editor = {}
 
@@ -11,7 +11,7 @@ Editor.bufopts = {
   swapfile = false,
   buftype = "nofile",
   modifiable = true,
-  filetype = "anki_editor",
+  filetype = "html",
   syntax = "html",
   bufhidden = "hide",
 }
@@ -21,9 +21,9 @@ function Editor:get_id()
 end
 
 local function create_buf()
-  buf = api.nvim_create_buf(true, true)
+  local buf = api.nvim_create_buf(true, true)
   for k, v in pairs(Editor.bufopts) do
-    api.nvim_buf_set_option(buf, k, v)
+    api.nvim_set_option_value(k, v, { buf = buf })
   end
   api.nvim_buf_attach(buf, false, {})
   return buf
@@ -33,7 +33,6 @@ local function mk_win(field, properties, row)
   local ui = api.nvim_list_uis()[1]
   local buf = create_buf()
 
-  local borderchars = properties.borderchars
   properties.relative = "editor"
   properties.height = math.floor(ui.height * properties.height - 2 - 1)
   if properties.height <= 0 then
@@ -43,64 +42,27 @@ local function mk_win(field, properties, row)
   if properties.width <= 0 then
     properties.width = 1
   end
-  properties.borderchars = nil
   properties.row = row
   properties.col = 1
+
   local win = api.nvim_open_win(buf, true, properties)
 
-  local border_buf = api.nvim_create_buf(false, true)
+  local header_buf = api.nvim_create_buf(false, true)
   local opts = {
     style = "minimal",
     relative = "editor",
-    width = properties.width + 2,
     height = properties.height + 2,
+    width = properties.width + 2,
     focusable = false,
     row = row - 1,
     col = 0,
   }
-
-  local border_win = api.nvim_open_win(border_buf, false, opts)
-  local half = math.floor(opts.width / 2)
-  local len = half - 2 - (math.floor(string.len(field) / 2))
-
-  local len2 = len
-
-  if opts.width % 2 ~= 0 then
-    len2 = len2 + 1
-  end
-
-  if string.len(field) % 2 ~= 0 then
-    len2 = len2 - 1
-  end
-
-  local top_border = {
-    borderchars[1]
-      .. string.rep(borderchars[2], len)
-      .. " "
-      .. field
-      .. " "
-      .. string.rep(borderchars[2], len2)
-      .. borderchars[3],
-  }
-
-  local bottom_border = {
-    borderchars[7] .. string.rep(borderchars[6], opts.width - 2) .. borderchars[5],
-  }
-
-  local middle_border = {
-    borderchars[8] .. string.rep(" ", opts.width - 2) .. borderchars[4],
-  }
-
-  api.nvim_buf_set_lines(border_buf, 0, 0, false, top_border)
-  for i = 1, opts.height - 2 do
-    api.nvim_buf_set_lines(border_buf, i, i, true, middle_border)
-  end
-  api.nvim_buf_set_lines(border_buf, opts.height - 1, opts.height - 1, true, bottom_border)
-
-  cmd("autocmd WinClosed <buffer=" .. buf .. '> lua require"anki".delete_editor(' .. id .. ")")
-  cmd("autocmd WinClosed <buffer=" .. border_buf .. '> lua require"anki".delete_editor(' .. id .. ")")
-
-  return buf, win, border_buf, border_win
+  local header_win = api.nvim_open_win(header_buf, false, opts)
+  local header = { "# " .. field .. "" }
+  api.nvim_buf_set_lines(header_buf, 0, 2, false, header)
+  cmd("autocmd WinClosed <buffer=" .. buf .. '> lua require"ankifill.editor".delete_editor(' .. id .. ")")
+  cmd("autocmd WinClosed <buffer=" .. header_buf .. '> lua require"ankifill.editor".delete_editor(' .. id .. ")")
+  return buf, win, header_buf, header_win
 end
 
 function Editor:new(model_name, deck)
@@ -108,11 +70,10 @@ function Editor:new(model_name, deck)
   model.name = model_name
   model.model_fields = API.GetModelFieldNames(model_name)
   model.editor_fields, model.editor_fields_order = models.defaut_editor_conf(model.model_fields)
-
   local row = 1
   cmd("set winhighlight=Normal:MyNormal")
+
   local fields = {}
-  fields.Deck = deck
   for _, field in ipairs(model.editor_fields_order) do
     local properties = model.editor_fields[field]
     local buf, win, border_buf, border_win = mk_win(field, properties, row)
@@ -126,8 +87,10 @@ function Editor:new(model_name, deck)
   end
 
   local current_field = model.editor_fields_order[1]
+
   if deck and fields.Deck then
     api.nvim_buf_set_lines(fields.Deck.buf, 0, -1, true, { deck })
+    -- api.nvim_set_option_value("modifiable", false, { buf = fields.Deck.buf })
     if model.editor_fields_order[1] == "Deck" then
       current_field = model.editor_fields_order[2]
     end

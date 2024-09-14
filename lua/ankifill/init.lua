@@ -1,25 +1,11 @@
 local API = require("ankifill.api")
 local editor = require("ankifill.editor")
+local config = require("ankifill.config")
 local M = {}
-
-M.defaults = {
-  anki_connect_url = "http://localhost:8765",
-  default_deck = "Default",
-  image_dir = "/home/youq-chan/Pictures/Screenshots",
-  default_model = "Basic",
-  code_formatters = {},
-}
 
 function M.setup(user_config)
   user_config = user_config or {}
-  M.options = vim.tbl_deep_extend("force", {}, M.defaults, user_config)
-end
-
-function M.getconfig(key)
-  if key then
-    return M.options[key]
-  end
-  return M.options
+  config.set(user_config)
 end
 
 function M.run()

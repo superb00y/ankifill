@@ -2,12 +2,10 @@ local M = {}
 local utils = require("ankifill.utils")
 
 M.defaut_editor_conf = function(fields)
-  local borderchars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
   local editor_fields = {
     Deck = {
       height = 0.1, -- 10%
       width = 1, -- 100%
-      borderchars = borderchars,
     },
   }
 
@@ -15,7 +13,6 @@ M.defaut_editor_conf = function(fields)
     editor_fields[field] = {
       height = 0.9 / #fields,
       width = 1,
-      borderchars = borderchars,
     }
   end
 
