@@ -1,9 +1,13 @@
 local M = {}
 local utils = require("ankifill.utils")
 
-M.defaut_editor_conf = function(fields)
+M.editor_conf = function(fields)
   local editor_fields = {
     Deck = {
+      relative = "editor",
+      -- style = "minimal",
+      border = "rounded",
+      title = " ● Deck:",
       height = 0.1, -- 10%
       width = 1, -- 100%
     },
@@ -11,6 +15,10 @@ M.defaut_editor_conf = function(fields)
 
   for _, field in pairs(fields) do
     editor_fields[field] = {
+      relative = "editor",
+      -- style = "minimal",
+      border = "rounded",
+      title = " ● " .. field .. ":",
       height = 0.9 / #fields,
       width = 1,
     }
