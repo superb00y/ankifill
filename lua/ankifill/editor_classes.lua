@@ -53,6 +53,8 @@ end
 local function mk_field(properties, row)
   local ui = api.nvim_list_uis()[1]
   local buf = create_buf()
+  properties.relative = "editor"
+  properties.border = "rounded"
   properties.height = math.floor(ui.height * properties.height - 2)
   properties.width = math.floor(ui.width * properties.width - 2)
   properties.row = row
@@ -140,42 +142,6 @@ end
 function Editor:get_model()
   return self.model
 end
-
--- TODO: Editor modify card model
--- api.nvim_err_writeln((vim.inspect(card_info)))
--- local model_name = card_info.modelName
--- local styling = anki_connect.modelStyling(model_name)
--- local template = anki_connect.modelTemplates(model_name)
--- local fields = anki_connect.modelFieldsOnTemplates(model_name)
--- api.nvim_err_writeln((vim.inspect(styling)))
--- api.nvim_err_writeln((vim.inspect(template)))
--- api.nvim_err_writeln((vim.inspect(fields)))
--- local fields_names = anki_connect.modelFieldNames(model_name)
--- local s = [[
---  <!doctype html>
-
---  <html lang="fr">
---  <head>
---    <meta charset="utf-8">
---    <title>Anki Preview</title>
---  <style>
--- ]]
--- s = s .. card_info.css .. "\n</style>\n</head>"
--- local note
----- Take the 1st note of the template (if the template generates multiple notes)
--- for _, c in pairs(template) do
---  note = c
---  break
--- end
--- local front = note.Front
----- api.nvim_err_writeln("Front : " .. front)
--- for yo in front:gmatch("{{(.-)}}") do
---  -- api.nvim_err_writeln("Match pour front : " .. tostring(yo))
--- end
--- local back = note.Back
--- for yo in back:gmatch("{{(.-)}}") do
---  -- api.nvim_err_writeln("Match pour back : " .. tostring(yo))
--- end
 
 function Editor:get_fields_contents()
   local fields = {}

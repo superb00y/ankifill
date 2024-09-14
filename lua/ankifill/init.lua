@@ -1,5 +1,4 @@
 local API = require("ankifill.api")
-local api = vim.api
 local editor = require("ankifill.editor")
 local config = require("ankifill.config")
 local M = {}
@@ -43,14 +42,6 @@ function M.run()
       end
     end
   end)
-
-  api.nvim_set_keymap("n", "<S-k>", '<Cmd>lua require("ankifill.editor").prev_field()<CR>', {})
-  api.nvim_set_keymap("n", "<S-j>", '<Cmd>lua require("ankifill.editor").next_field()<CR>', {})
-  api.nvim_set_keymap("n", "<S-s>", '<Cmd>lua require("ankifill.editor").write()<CR>', {})
-
-  api.nvim_set_keymap("n", "<S-i>", '<Cmd>lua require("ankifill.editor").pasteimage()<CR>', {})
-  api.nvim_set_keymap("n", "<S-g>", '<Cmd>lua require("ankifill.editor").sendtogui()<CR>', {})
-  api.nvim_set_keymap("n", "<S-o>", '<Cmd>lua require("ankifill.editor").guiDeckOverview()<CR>', {})
 end
 
 return M

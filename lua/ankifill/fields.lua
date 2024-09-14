@@ -5,8 +5,6 @@ M.editor_conf = function(fields)
   local editor_fields = {}
   for _, field in pairs(fields) do
     editor_fields[field] = {
-      relative = "editor",
-      border = "rounded",
       title = " ● " .. field .. ":",
       height = 0.9 / #fields,
       width = 1,
