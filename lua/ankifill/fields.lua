@@ -5,25 +5,21 @@ M.editor_conf = function(fields)
   local editor_fields = {
     Deck = {
       relative = "editor",
-      -- style = "minimal",
-      border = "rounded",
+      border = "double",
       title = " ● Deck:",
-      height = 0.1, -- 10%
-      width = 1, -- 100%
+      height = 0.1,
+      width = 1,
     },
   }
-
   for _, field in pairs(fields) do
     editor_fields[field] = {
       relative = "editor",
-      -- style = "minimal",
       border = "rounded",
       title = " ● " .. field .. ":",
       height = 0.9 / #fields,
       width = 1,
     }
   end
-
   local editor_fields_order = utils.table_copy(fields)
   table.insert(editor_fields_order, 1, "Deck")
   return editor_fields, editor_fields_order

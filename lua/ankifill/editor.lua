@@ -1,5 +1,6 @@
 local M = {}
 local api = vim.api
+local select = require("ankifill.select")
 local API = require("ankifill.api")
 local editor_class = require("ankifill.editor_classes")
 M.editors = {}
@@ -39,10 +40,11 @@ function M.write()
   end
 
   e:delete()
+  API.AddCard(deck, model.name, fields)
+end
 
-  local note = { deckName = deck, modelName = model.name, fields = fields }
-
-  API.addNote(note)
+function M.pasteimage()
+  select.SelectImage()
 end
 
 function M.next_field()
@@ -57,6 +59,14 @@ function M.prev_field()
   if e then
     e:prev_field()
   end
+end
+
+function M.reset(model, deck)
+  local c = current_editor()
+  local id = c:get_id()
+  M.delete_editor(id)
+  local e = editor_class.Editor:new(model, deck)
+  table.insert(M.editors, e)
 end
 
 function M.add_note(model, deck)

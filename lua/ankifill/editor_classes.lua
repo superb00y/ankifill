@@ -8,7 +8,7 @@ local Editor = {}
 
 Editor.__index = Editor
 Editor.bufopts = {
-  swapfile = false,
+  swapfile = true,
   buftype = "nofile",
   modifiable = true,
   filetype = "html",
@@ -32,7 +32,7 @@ end
 local function mk_win(properties, row)
   local ui = api.nvim_list_uis()[1]
   local buf = create_buf()
-  properties.height = math.floor(ui.height * properties.height - 2 - 1)
+  properties.height = math.floor(ui.height * properties.height - 2)
   if properties.height <= 0 then
     properties.height = 1
   end
@@ -53,7 +53,6 @@ function Editor:new(model_name, deck)
   model.model_fields = API.GetModelFieldNames(model_name)
   model.editor_fields, model.editor_fields_order = models.editor_conf(model.model_fields)
   local row = 1
-  cmd("set winhighlight=Normal:MyNormal")
   local fields = {}
   for _, field in ipairs(model.editor_fields_order) do
     local properties = model.editor_fields[field]
@@ -68,8 +67,7 @@ function Editor:new(model_name, deck)
   local current_field = model.editor_fields_order[1]
 
   if deck and fields.Deck then
-    api.nvim_buf_set_lines(fields.Deck.buf, 0, -1, true, { deck, model.name })
-    -- api.nvim_set_option_value("modifiable", false, { buf = fields.Deck.buf })
+    api.nvim_buf_set_lines(fields.Deck.buf, 0, -1, true, { deck })
     if model.editor_fields_order[1] == "Deck" then
       current_field = model.editor_fields_order[2]
     end
@@ -113,6 +111,7 @@ function Editor:next_field()
   end
   return false
 end
+
 function Editor:prev_field()
   local cur_win = api.nvim_get_current_win()
   for idx, field in ipairs(self.model.editor_fields_order) do
