@@ -3,6 +3,7 @@ local api = vim.api
 local select = require("ankifill.select")
 local API = require("ankifill.api")
 local editor_class = require("ankifill.editor_classes")
+local utils = require("ankifill.utils")
 M.editors = {}
 
 local function current_editor()
@@ -62,6 +63,8 @@ function M.sendtogui()
   end
 
   API.guiAddCard(model.deck, model.name, fields)
+
+  utils.notify("card sent to anki!")
 end
 
 function M.next_field()
@@ -84,6 +87,7 @@ function M.reset(model, deck)
   M.delete_editor(id)
   local e = editor_class.Editor:new(model, deck)
   table.insert(M.editors, e)
+  utils.notify("editor reset!")
 end
 
 function M.setKeyMaps()
@@ -93,6 +97,7 @@ function M.setKeyMaps()
   api.nvim_set_keymap("n", "<S-i>", '<Cmd>lua require("ankifill.editor").pasteimage()<CR>', {})
   api.nvim_set_keymap("n", "<S-g>", '<Cmd>lua require("ankifill.editor").sendtogui()<CR>', {})
   api.nvim_set_keymap("n", "<S-o>", '<Cmd>lua require("ankifill.editor").guiDeckOverview()<CR>', {})
+  utils.notify("key maps set!")
 end
 
 function M.remKeyMaps()
@@ -102,10 +107,12 @@ function M.remKeyMaps()
   api.nvim_del_keymap("n", "<S-i>")
   api.nvim_del_keymap("n", "<S-g>")
   api.nvim_del_keymap("n", "<S-o>")
+  utils.notify("key maps removed!")
 end
 
 function M.pasteimage()
   select.SelectImage()
+  utils.notify("image sent to anki!")
 end
 
 function M.guiDeckOverview()
@@ -114,6 +121,7 @@ function M.guiDeckOverview()
   if e then
     deck = e:get_model().deck
     API.guiDeckOveriew(deck)
+    utils.notify("gui deck overview")
   end
 end
 
@@ -121,6 +129,7 @@ function M.add_note(model, deck)
   local e = editor_class.Editor:new(model, deck)
   table.insert(M.editors, e)
   M.setKeyMaps()
+  utils.notify("opened")
 end
 
 return M
