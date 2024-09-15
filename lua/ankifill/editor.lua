@@ -1,4 +1,5 @@
 local M = {}
+local cmd = vim.cmd
 local api = vim.api
 local select = require("ankifill.select")
 local API = require("ankifill.api")
@@ -43,6 +44,7 @@ function M.write()
   end
 
   e:delete()
+
   API.AddCard(deck, model.name, fields)
 end
 
@@ -130,10 +132,18 @@ function M.guiDeckOverview()
   end
 end
 
+function M.setup_highlights()
+  cmd("highlight AnkiHeaderBorder guifg=#a1AF50")
+  cmd("highlight AnkiHeaderTitle guifg=#affF50 gui=bold")
+  cmd("highlight AnkiFieldBorder guifg=#cfa0dd")
+  cmd("highlight AnkiFieldTitle guifg=#fff0dd gui=bold")
+end
+
 function M.add_note(model, deck)
   local e = editor_class.Editor:new(model, deck)
   table.insert(M.editors, e)
   M.setKeyMaps()
+  M.setup_highlights()
   utils.notify("opened")
 end
 

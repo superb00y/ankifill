@@ -16,10 +16,6 @@ Editor.bufopts = {
   bufhidden = "wipe",
 }
 
-function Editor:get_id()
-  return self.id
-end
-
 local function create_buf()
   local buf = api.nvim_create_buf(true, true)
   for k, v in pairs(Editor.bufopts) do
@@ -47,6 +43,7 @@ local function mk_header(deck)
     col = 1,
   }
   local win = api.nvim_open_win(buf, true, properties)
+  api.nvim_set_option_value("winhl", "FloatTitle:AnkiHeaderTitle,FloatBorder:AnkiHeaderBorder", { win = win })
   cmd("autocmd WinClosed <buffer=" .. buf .. '> lua require"ankifill.editor".delete_editor(' .. id .. ")")
   return buf, win
 end
@@ -61,6 +58,7 @@ local function mk_field(properties, row)
   properties.row = row
   properties.col = 1
   local win = api.nvim_open_win(buf, true, properties)
+  api.nvim_set_option_value("winhl", "FloatTitle:AnkiFieldTitle,FloatBorder:AnkiFieldBorder", { win = win })
   cmd("autocmd WinClosed <buffer=" .. buf .. '> lua require"ankifill.editor".delete_editor(' .. id .. ")")
   return buf, win
 end
@@ -140,6 +138,10 @@ function Editor:prev_field()
     end
   end
   return false
+end
+
+function Editor:get_id()
+  return self.id
 end
 
 function Editor:get_model()

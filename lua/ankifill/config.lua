@@ -1,9 +1,6 @@
-local M = {
-  options = {},
-  config = {},
-}
+local M = {}
 
-M.options = {
+M.default = {
   default_deck = "Default",
   default_model = "Basic",
   image_dir = "/home/youq-chan/Pictures/Screenshots",
@@ -14,15 +11,18 @@ M.options = {
   code_formatters = {},
 }
 
+M.options = {}
+
 function M.set(opts)
-  M.config = vim.tbl_deep_extend("force", {}, M.options, opts or {})
+  M.options = vim.tbl_deep_extend("force", M.default, opts)
+  print("Debug: Resulting config:", vim.inspect(M.options))
 end
 
 function M.get(key)
   if key then
-    return M.config[key]
+    return M.options[key]
   end
-  return M.config
+  return M.options
 end
 
 return M

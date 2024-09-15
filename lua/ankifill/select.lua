@@ -2,8 +2,6 @@ local API = require("ankifill.api")
 local scan = require("plenary.scandir")
 local Path = require("plenary.path")
 local get_config = require("ankifill.config").get
-local image_dir = get_config("image_dir")
-local image_formatting = get_config("image_formatting")
 
 Select = {}
 Select.Card = function(func)
@@ -43,6 +41,8 @@ Select.Card = function(func)
 end
 
 Select.SelectImage = function()
+  local image_dir = get_config("image_dir")
+  local image_formatting = get_config("image_formatting")
   local images = scan.scan_dir(image_dir, { only_dirs = false, depth = 1 })
   local image_files = {}
 
