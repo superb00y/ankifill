@@ -19,14 +19,12 @@ function M.delete_editor(id)
     if e:get_id() == id then
       e:delete()
       table.remove(M.editors, idx)
-      goto continue
+      M.remKeyMaps()
     else
       api.nvim_err_writeln("Id '" .. id .. "' doesn't match any editor")
       return
     end
   end
-  ::continue::
-  M.remKeyMaps()
 end
 
 function M.write()
@@ -81,19 +79,23 @@ function M.prev_field()
   end
 end
 
-function M.reset(model, deck)
+function M.reset()
   local c = current_editor()
   local id = c:get_id()
   M.delete_editor(id)
-  local e = editor_class.Editor:new(model, deck)
-  table.insert(M.editors, e)
-  utils.notify("editor reset!")
+  local function editor(model, deck)
+    local e = editor_class.Editor:new(model, deck)
+    table.insert(M.editors, e)
+    utils.notify("editor reset!")
+  end
+  Select.Card(editor)
 end
 
 function M.setKeyMaps()
   api.nvim_set_keymap("n", "<S-k>", '<Cmd>lua require("ankifill.editor").prev_field()<CR>', {})
   api.nvim_set_keymap("n", "<S-j>", '<Cmd>lua require("ankifill.editor").next_field()<CR>', {})
   api.nvim_set_keymap("n", "<S-s>", '<Cmd>lua require("ankifill.editor").write()<CR>', {})
+  api.nvim_set_keymap("n", "<S-r>", '<Cmd>lua require("ankifill.editor").reset()<CR>', {})
   api.nvim_set_keymap("n", "<S-i>", '<Cmd>lua require("ankifill.editor").pasteimage()<CR>', {})
   api.nvim_set_keymap("n", "<S-g>", '<Cmd>lua require("ankifill.editor").sendtogui()<CR>', {})
   api.nvim_set_keymap("n", "<S-o>", '<Cmd>lua require("ankifill.editor").guiDeckOverview()<CR>', {})
@@ -104,6 +106,7 @@ function M.remKeyMaps()
   api.nvim_del_keymap("n", "<S-k>")
   api.nvim_del_keymap("n", "<S-j>")
   api.nvim_del_keymap("n", "<S-s>")
+  api.nvim_del_keymap("n", "<S-r>")
   api.nvim_del_keymap("n", "<S-i>")
   api.nvim_del_keymap("n", "<S-g>")
   api.nvim_del_keymap("n", "<S-o>")

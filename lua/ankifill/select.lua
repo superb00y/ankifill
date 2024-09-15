@@ -5,6 +5,41 @@ local Path = require("plenary.path") -- Require plenary for file handling
 local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
 
 Select = {}
+Select.Card = function(func)
+  local deck_names = API.GetDeckNames()
+  deck_names[#deck_names + 1] = "Add Deck"
+  local model_names = API.GetModelNames()
+  vim.ui.select(deck_names, {
+    prompt = "Choose a deck:",
+  }, function(deck)
+    if deck == "Add Deck" then
+      vim.ui.input({
+        prompt = "Enter deck name:",
+      }, function(name)
+        if name then
+          API.CreateDeck(name)
+          vim.ui.select(model_names, {
+            prompt = "Choose a model:",
+          }, function(model)
+            if model then
+              func(model, name)
+            end
+          end)
+        end
+      end)
+    else
+      if deck then
+        vim.ui.select(model_names, {
+          prompt = "Choose a model:",
+        }, function(model)
+          if model then
+            func(model, deck)
+          end
+        end)
+      end
+    end
+  end)
+end
 
 Select.SelectImage = function()
   local images = scan.scan_dir(image_dir, { only_dirs = false, depth = 1 })
