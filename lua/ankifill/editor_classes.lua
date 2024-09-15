@@ -13,7 +13,7 @@ Editor.bufopts = {
   modifiable = true,
   filetype = "html",
   syntax = "html",
-  bufhidden = "hide",
+  bufhidden = "wipe",
 }
 
 function Editor:get_id()
@@ -33,6 +33,7 @@ local function mk_header(deck)
   local ui = api.nvim_list_uis()[1]
   local buf = api.nvim_create_buf(true, true)
   api.nvim_set_option_value("buftype", "nofile", { buf = buf })
+  api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
   api.nvim_buf_set_lines(buf, 0, -1, true, { " ● Deck:" .. deck })
   api.nvim_set_option_value("modifiable", false, { buf = buf })
   api.nvim_buf_attach(buf, false, {})
@@ -88,6 +89,8 @@ function Editor:new(model_name, deck)
   end
   local current_field = model.editor_fields_order[1]
   api.nvim_set_current_win(fields[current_field].win)
+  vim.cmd("startinsert")
+
   local this = { id = id, fields = fields, model = model }
   id = id + 1
   setmetatable(this, self)

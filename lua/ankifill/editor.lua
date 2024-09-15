@@ -89,6 +89,8 @@ function M.reset()
     utils.notify("editor reset!")
   end
   Select.Card(editor)
+  M.setKeyMaps()
+  utils.notify("reset!!!!")
 end
 
 function M.setKeyMaps()

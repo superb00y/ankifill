@@ -1,8 +1,9 @@
 local API = require("ankifill.api")
--- -- local Buffer = require("ankifill.buffer")
-local scan = require("plenary.scandir") -- For directory scanning
-local Path = require("plenary.path") -- Require plenary for file handling
-local image_dir = "/home/youq-chan/Pictures/Screenshots" -- Replace this with the directory containing your images
+local scan = require("plenary.scandir")
+local Path = require("plenary.path")
+local get_config = require("ankifill.config").get
+local image_dir = get_config("image_dir")
+local image_formatting = get_config("image_formatting")
 
 Select = {}
 Select.Card = function(func)
@@ -55,12 +56,13 @@ Select.SelectImage = function()
     print("No images found in the directory: " .. image_dir)
     return
   end
+
   vim.ui.select(image_files, {
     prompt = "choose an image:",
   }, function(choice)
     if choice then
       local image_path = Path:new(image_dir, choice):absolute() -- Convert relative path to absolute
-      local image_reference = string.format('<div style="text-align: center;"><img src="%s"></div>', choice)
+      local image_reference = image_formatting(choice)
       API.SendImagetoAnki(choice, image_path)
       vim.api.nvim_put({ image_reference }, "l", true, true)
     end

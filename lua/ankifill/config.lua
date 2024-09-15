@@ -1,25 +1,28 @@
-local M = {}
+local M = {
+  options = {},
+  config = {},
+}
 
-M.defaults = {
+M.options = {
   default_deck = "Default",
   default_model = "Basic",
   image_dir = "/home/youq-chan/Pictures/Screenshots",
-  image_formating = {},
-  text_formating = {},
+  image_formatting = function(choice)
+    return string.format('<div style="text-align: center;"><img src="%s"></div>', choice)
+  end,
+  text_formatting = {},
   code_formatters = {},
 }
 
-M.options = {}
-
 function M.set(opts)
-  M.options = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
+  M.config = vim.tbl_deep_extend("force", {}, M.options, opts or {})
 end
 
 function M.get(key)
   if key then
-    return M.options[key]
+    return M.config[key]
   end
-  return M.options
+  return M.config
 end
 
 return M
