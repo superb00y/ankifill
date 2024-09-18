@@ -22,17 +22,8 @@ use {
   config = {
     anki_connect_url = "http://localhost:8765",
     default_deck = "My Default Deck",
-    default_model = "Basic (and reversed card)",
-    code_formatters = {
-      lua = function(code)
-        -- Add Lua formatting logic here
-        return code
-      end,
-      python = function(code)
-        -- Add Python formatting logic here
-        return code
-      end,
-    }
+    default_model = "Basic",
+    code_formatters = {}
   }
 }
 ```
@@ -47,17 +38,8 @@ use {
     require("ankifill").setup({
       anki_connect_url = "http://localhost:8765",
       default_deck = "My Default Deck",
-      default_model = "Basic (and reversed card)",
-      code_formatters = {
-        lua = function(code)
-          -- Add Lua formatting logic here
-          return code
-        end,
-        python = function(code)
-          -- Add Python formatting logic here
-          return code
-        end,
-      }
+      default_model = "Basic",
+      code_formatters = {}
     })
   end,
 }
