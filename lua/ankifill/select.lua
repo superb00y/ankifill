@@ -1,24 +1,16 @@
-local has_telescope = pcall(require, "telescope")
-
-if not has_telescope then
-  error("This plugins requires nvim-telescope/telescope.nvim")
-end
-
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
+local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
 local API = require("ankifill.api")
-local scan = require("plenary.scandir")
-local Path = require("plenary.path")
 local get_config = require("ankifill.config").get
 
 Select = {}
-local opts = {}
-
 Select.Card = function(func)
+  local opts = {}
   pickers
     .new(opts, {
       prompt_title = "Deck",
@@ -59,65 +51,79 @@ Select.Card = function(func)
     :find()
 end
 
---   vim.ui.select(deck_names, {
---     prompt = "Choose a deck:",
---   }, function(deck)
---     if deck == "Add Deck" then
---       vim.ui.input({
---         prompt = "Enter deck name:",
---       }, function(name)
---         if name then
---           API.CreateDeck(name)
---           vim.ui.select(model_names, {
---             prompt = "Choose a model:",
---           }, function(model)
---             if model then
---               func(model, name)
---             end
---           end)
---         end
---       end)
---     else
---       if deck then
---         vim.ui.select(model_names, {
---           prompt = "Choose a model:",
---         }, function(model)
---           if model then
---             func(model, deck)
---           end
---         end)
---       end
---     end
---   end)
--- end
+Select.SelectImage = function(opts)
+  opts = opts or {}
+  -- local image_formatting = get_config("image_formatting")
+  local search_dir = get_config("image_dir")
+  local filetypes = { "png", "jpg", "gif" }
 
-Select.SelectImage = function()
-  local image_dir = get_config("image_dir")
-  local image_formatting = get_config("image_formatting")
-  local images = scan.scan_dir(image_dir, { only_dirs = false, depth = 1 })
-  local image_files = {}
+  local fd = {
+    "fd",
+    "--type",
+    "f",
+    "--regex",
+    [[.*.(]] .. table.concat(filetypes, "|") .. [[)$]],
+    ".",
+    search_dir,
+  }
 
-  for _, file in ipairs(images) do
-    if file:match("%.jpg$") or file:match("%.png$") or file:match("%.jpeg$") then
-      table.insert(image_files, Path:new(file):make_relative(image_dir)) -- Use relative paths
-    end
-  end
-
-  if #image_files == 0 then
-    print("No images found in the directory: " .. image_dir)
+  local ub_pid = 0
+  local ub_socket = ""
+  local ueberzug_tmp_dir = ""
+  ueberzug_tmp_dir = os.getenv("TMPDIR") or "/tmp"
+  local uuid = vim.fn.getpid()
+  local ub_pid_file = ueberzug_tmp_dir .. "/." .. uuid
+  os.execute(string.format("ueberzugpp layer --no-stdin --silent --use-escape-codes --pid-file %s", ub_pid_file))
+  local pid_file = io.open(ub_pid_file, "r")
+  if pid_file then
+    ub_pid = pid_file:read("*n")
+    pid_file:close()
+    os.remove(ub_pid_file)
+  else
+    print("Error: Failed to read PID file")
     return
   end
+  ub_socket = string.format("%s/ueberzugpp-%s.socket", ueberzug_tmp_dir, ub_pid)
 
-  vim.ui.select(image_files, {
-    prompt = "choose an image:",
-  }, function(choice)
-    if choice then
-      local image_path = Path:new(image_dir, choice):absolute() -- Convert relative path to absolute
-      local image_reference = image_formatting(choice)
-      API.SendImagetoAnki(choice, image_path)
-      vim.api.nvim_put({ image_reference }, "l", true, true)
-    end
-  end)
+  pickers
+    .new(opts, {
+      prompt_title = "image files",
+      finder = finders.new_oneshot_job(fd, opts),
+      previewer = previewers.new_termopen_previewer({
+        get_command = function(entry, status)
+          local win_info = vim.fn.getwininfo(status.preview_win)[1]
+          local width = win_info.width - 1
+          local height = win_info.height - 1
+          local x = win_info.wincol
+          local y = win_info.winrow
+
+          local cmd = string.format(
+            "ueberzugpp cmd -s %s -a add -i PREVIEW -x %d -y %d --max-width %d --max-height %d -f %s",
+            ub_socket,
+            x,
+            y,
+            width,
+            height,
+            entry.value
+          )
+          os.execute(cmd)
+
+          local exit = string.format("ueberzugpp cmd -s %s -a remove -i PREVIEW", ub_socket)
+          os.execute(exit)
+          -- return cmd
+        end,
+      }),
+      attach_mappings = function(_, map)
+        actions.select_default:replace(function(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          actions.close(prompt_bufnr)
+          os.execute(string.format("ueberzugpp cmd -s %s -a exit", ub_socket))
+          print("Selected image: " .. selection.value)
+        end)
+        return true
+      end,
+    })
+    :find()
 end
 
 return Select

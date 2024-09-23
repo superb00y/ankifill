@@ -8,14 +8,16 @@ M.default = {
     return string.format('<div style="text-align: center;"><img src="%s"></div>', choice)
   end,
   text_formatting = {},
-  code_formatters = {},
+  code_formatters = function(code)
+    return string.format("<pre>%s</pre>", code)
+  end,
 }
 
 M.options = {}
 
 function M.set(opts)
   M.options = vim.tbl_deep_extend("force", M.default, opts)
-  print("Debug: Resulting config:", vim.inspect(M.options))
+  -- print("Debug: Resulting config:", vim.inspect(M.options))
 end
 
 function M.get(key)

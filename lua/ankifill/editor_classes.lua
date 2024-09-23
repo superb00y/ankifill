@@ -36,7 +36,7 @@ local function mk_header(deck)
   local properties = {
     relative = "editor",
     style = "minimal",
-    border = "single",
+    border = "rounded",
     height = 1,
     width = math.floor(ui.width - 2),
     row = 1,
