@@ -17,7 +17,7 @@ Editor.bufopts = {
 }
 
 local function create_buf()
-  local buf = api.nvim_create_buf(true, true)
+  local buf = api.nvim_create_buf(false, true)
   for k, v in pairs(Editor.bufopts) do
     api.nvim_set_option_value(k, v, { buf = buf })
   end
@@ -27,7 +27,7 @@ end
 
 local function mk_header(deck)
   local ui = api.nvim_list_uis()[1]
-  local buf = api.nvim_create_buf(true, true)
+  local buf = api.nvim_create_buf(false, true)
   api.nvim_set_option_value("buftype", "nofile", { buf = buf })
   api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
   api.nvim_buf_set_lines(buf, 0, -1, true, { " ● Deck:" .. deck })
@@ -89,10 +89,54 @@ function Editor:new(model_name, deck)
   api.nvim_set_current_win(fields[current_field].win)
   vim.cmd("startinsert")
 
-  local this = { id = id, fields = fields, model = model }
+  local this = {
+    id = id,
+    fields = fields,
+    model = model,
+    images = {
+      to_send = {},
+      sent = false,
+    },
+  }
+
   id = id + 1
   setmetatable(this, self)
   return this
+end
+
+function Editor:get_id()
+  return self.id
+end
+
+function Editor:get_model()
+  return self.model
+end
+
+function Editor:add_image(image_name, image_path)
+  table.insert(self.images.to_send, { name = image_name, path = image_path })
+  self.images.sent = false
+end
+
+function Editor:send_images()
+  for _, image in ipairs(self.images.to_send) do
+    API.SendImagetoAnki(image.name, image.path)
+  end
+  self.images.to_send = {}
+  self.images.sent = true
+end
+
+function Editor:reset_images()
+  self.images.to_send = {}
+  self.images.sent = false
+end
+
+function Editor:get_fields_contents()
+  local fields = {}
+  for _, field in ipairs(self.model.editor_fields_order) do
+    local lines = api.nvim_buf_get_lines(self.fields[field].buf, 0, -1, true)
+    fields[field] = table.concat(lines, "<br>\n")
+  end
+  return fields
 end
 
 function Editor:delete()
@@ -138,23 +182,6 @@ function Editor:prev_field()
     end
   end
   return false
-end
-
-function Editor:get_id()
-  return self.id
-end
-
-function Editor:get_model()
-  return self.model
-end
-
-function Editor:get_fields_contents()
-  local fields = {}
-  for _, field in ipairs(self.model.editor_fields_order) do
-    local lines = api.nvim_buf_get_lines(self.fields[field].buf, 0, -1, true)
-    fields[field] = table.concat(lines, "<br>\n")
-  end
-  return fields
 end
 
 M.Editor = Editor

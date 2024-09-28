@@ -1,10 +1,12 @@
 local M = {}
-local cmd = vim.cmd
 local api = vim.api
 local select = require("ankifill.select")
 local API = require("ankifill.api")
 local editor_class = require("ankifill.editor_classes")
 local utils = require("ankifill.utils")
+
+local get_config = require("ankifill.config").get
+local image_formatting = get_config("image_formatting")
 M.editors = {}
 
 local function current_editor()
@@ -43,9 +45,9 @@ function M.write()
     return
   end
 
-  e:delete()
-
+  e:send_images()
   API.AddCard(deck, model.name, fields)
+  e:reset_images()
 end
 
 function M.sendtogui()
@@ -62,7 +64,9 @@ function M.sendtogui()
     return
   end
 
+  e:send_images()
   API.guiAddCard(model.deck, model.name, fields)
+  e:reset_images()
 
   utils.notify("card sent to anki!")
 end
@@ -96,44 +100,51 @@ function M.reset()
 end
 
 function M.setKeyMaps()
-  vim.keymap.set("n", "<S-k>", function()
+  vim.keymap.set("n", "<leader>nk", function()
     M.prev_field()
   end)
-  vim.keymap.set("n", "<S-j>", function()
+  vim.keymap.set("n", "<leader>nj", function()
     M.next_field()
   end)
-  vim.keymap.set("n", "<S-s>", function()
+  vim.keymap.set("n", "<leader>ns", function()
     M.write()
   end)
-  vim.keymap.set("n", "<S-r>", function()
+  vim.keymap.set("n", "<leader>nr", function()
     M.reset()
   end)
-  vim.keymap.set("n", "<S-i>", function()
+  vim.keymap.set("n", "<leader>ni", function()
     M.pasteimage()
   end)
-  vim.keymap.set("n", "<S-g>", function()
+  vim.keymap.set("n", "<leader>ng", function()
     M.sendtogui()
   end)
-  vim.keymap.set("n", "<S-o>", function()
+  vim.keymap.set("n", "<leader>no", function()
     M.guiDeckOverview()
   end)
   utils.notify("key maps set!")
 end
 
 function M.remKeyMaps()
-  vim.keymap.del("n", "<S-k>")
-  vim.keymap.del("n", "<S-j>")
-  vim.keymap.del("n", "<S-s>")
-  vim.keymap.del("n", "<S-r>")
-  vim.keymap.del("n", "<S-i>")
-  vim.keymap.del("n", "<S-g>")
-  vim.keymap.del("n", "<S-o>")
+  vim.keymap.del("n", "<leader>nk")
+  vim.keymap.del("n", "<leader>nj")
+  vim.keymap.del("n", "<leader>ns")
+  vim.keymap.del("n", "<leader>nr")
+  vim.keymap.del("n", "<leader>ni")
+  vim.keymap.del("n", "<leader>ng")
+  vim.keymap.del("n", "<leader>no")
   utils.notify("key maps removed!")
 end
 
 function M.pasteimage()
-  select.SelectImage()
-  utils.notify("image sent to anki!")
+  local e = current_editor()
+  if e then
+    local image = select.SelectImage()
+    e:add_image(image.name, image.path)
+    vim.api.nvim_put({
+      image_formatting(image.name),
+    }, "l", true, true)
+  end
+  -- utils.notify("image sent to anki!")
 end
 
 function M.guiDeckOverview()

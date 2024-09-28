@@ -44,3 +44,5 @@ use {
   end,
 }
 ```
+
+## use "ziontee113/icon-picker.nvim"

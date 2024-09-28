@@ -88,7 +88,7 @@ API.SendImagetoAnki = function(filename, path)
     action = "storeMediaFile",
     version = 6,
     params = {
-      filename = filename, -- Use the image file path as filename
+      filename = filename,
       path = path,
     },
   }

@@ -3,6 +3,7 @@ local M = {}
 M.default = {
   default_deck = "Default",
   default_model = "Basic",
+  image_preview = false,
   image_dir = "/home/youq-chan/Pictures/Screenshots",
   image_formatting = function(choice)
     return string.format('<div style="text-align: center;"><img src="%s"></div>', choice)
@@ -11,6 +12,22 @@ M.default = {
   code_formatters = function(code)
     return string.format("<pre>%s</pre>", code)
   end,
+  -- mappings = {
+  --   l = "next()",
+  --   h = "prev()",
+  --   n = "next()",
+  --   b = "prev()",
+  --   f = "flip()",
+  --   q = "close()",
+  --   a = "add()",
+  --   e = "edit()",
+  --   d = "delete()",
+  --   g = "browse_cards()",
+  --   o = "browse_subjects()",
+  --   k = "know()",
+  --   ["<CR>"] = "flip()",
+  --   [" "] = "flip()",
+  -- },
 }
 
 M.options = {}
