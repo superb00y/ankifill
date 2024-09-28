@@ -91,11 +91,10 @@ function M.reset()
   local function editor(model, deck)
     local e = editor_class.Editor:new(model, deck)
     table.insert(M.editors, e)
-    utils.notify("editor reset!")
   end
   Select.Card(editor)
   M.setKeyMaps()
-  utils.notify("reset!!!!")
+  utils.notify("Editor reset!  ")
 end
 
 function M.pasteimage()
@@ -119,7 +118,7 @@ function M.reset_fields()
   local e = current_editor()
   if e then
     e:reset_fields()
-    utils.notify("Fields reset (except locked field)")
+    utils.notify("Fields reset (except locked field) 󱀸 ")
   end
 end
 
@@ -130,7 +129,7 @@ function M.lock_current_field()
     for field_name, field in pairs(e.fields) do
       if field.win == current_win then
         e:lock_field(field_name)
-        utils.notify("Field '" .. field_name .. "' locked")
+        utils.notify("Field '" .. field_name .. "' locked  ")
         return
       end
     end
@@ -141,8 +140,15 @@ end
 function M.unlock_field()
   local e = current_editor()
   if e then
-    e:unlock_field()
-    utils.notify("Field unlocked")
+    local current_win = api.nvim_get_current_win()
+    for field_name, field in pairs(e.fields) do
+      if field.win == current_win then
+        e:unlock_field(field_name)
+        utils.notify("Field '" .. field_name .. "' unlocked  ")
+        return
+      end
+    end
+    utils.notify("No field selected")
   end
 end
 

@@ -83,6 +83,7 @@ function Editor:new(model_name, deck)
     fields[field] = {
       buf = buf,
       win = win,
+      locked = false,
     }
   end
   local current_field = model.editor_fields_order[1]
@@ -97,7 +98,6 @@ function Editor:new(model_name, deck)
       to_send = {},
       sent = false,
     },
-    locked_field = nil,
   }
 
   id = id + 1
@@ -115,31 +115,36 @@ end
 
 function Editor:reset_fields()
   for field_name, field in pairs(self.fields) do
-    if field_name ~= "header" and field_name ~= self.locked_field then
+    if field_name ~= "header" and field.locked ~= true then
       api.nvim_buf_set_lines(field.buf, 0, -1, false, { "" })
     end
   end
 end
 
 function Editor:lock_field(field_name)
-  if self.model.editor_fields[field_name] then
-    self.locked_field = field_name
-    local win = self.model.editor_fields[field_name].win
+  if self.fields[field_name] then
+    self.fields[field_name].locked = true
     api.nvim_set_option_value(
       "winhl",
       "FloatTitle:AnkiFieldTitleLocked,FloatBorder:AnkiFieldBorderLocked",
-      { win = win }
+      { win = self.fields[field_name].win }
     )
   else
     error("Invalid field name: " .. field_name)
   end
 end
 
-function Editor:unlock_field()
-  local name = self.locked_field
-  local win = self.model.editor_fields[name].win
-  api.nvim_set_option_value("winhl", "FloatTitle:AnkiFieldTitle,FloatBorder:AnkiFieldBorder", { win = win })
-  self.locked_field = nil
+function Editor:unlock_field(field_name)
+  if self.fields[field_name] then
+    self.fields[field_name].locked = false
+    api.nvim_set_option_value(
+      "winhl",
+      "FloatTitle:AnkiFieldTitle,FloatBorder:AnkiFieldBorder",
+      { win = self.fields[field_name].win }
+    )
+  else
+    error("Invalid field name: " .. field_name)
+  end
 end
 
 function Editor:add_image(image_name, image_path)
