@@ -97,6 +97,7 @@ function Editor:new(model_name, deck)
       to_send = {},
       sent = false,
     },
+    locked_field = nil,
   }
 
   id = id + 1
@@ -110,6 +111,35 @@ end
 
 function Editor:get_model()
   return self.model
+end
+
+function Editor:reset_fields()
+  for field_name, field in pairs(self.fields) do
+    if field_name ~= "header" and field_name ~= self.locked_field then
+      api.nvim_buf_set_lines(field.buf, 0, -1, false, { "" })
+    end
+  end
+end
+
+function Editor:lock_field(field_name)
+  if self.model.editor_fields[field_name] then
+    self.locked_field = field_name
+    local win = self.model.editor_fields[field_name].win
+    api.nvim_set_option_value(
+      "winhl",
+      "FloatTitle:AnkiFieldTitleLocked,FloatBorder:AnkiFieldBorderLocked",
+      { win = win }
+    )
+  else
+    error("Invalid field name: " .. field_name)
+  end
+end
+
+function Editor:unlock_field()
+  local name = self.locked_field
+  local win = self.model.editor_fields[name].win
+  api.nvim_set_option_value("winhl", "FloatTitle:AnkiFieldTitle,FloatBorder:AnkiFieldBorder", { win = win })
+  self.locked_field = nil
 end
 
 function Editor:add_image(image_name, image_path)

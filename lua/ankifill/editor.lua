@@ -5,8 +5,6 @@ local API = require("ankifill.api")
 local editor_class = require("ankifill.editor_classes")
 local utils = require("ankifill.utils")
 
-local get_config = require("ankifill.config").get
-local image_formatting = get_config("image_formatting")
 M.editors = {}
 
 local function current_editor()
@@ -46,6 +44,7 @@ function M.write()
   end
 
   e:send_images()
+  M.reset_fields()
   API.AddCard(deck, model.name, fields)
   e:reset_images()
 end
@@ -99,52 +98,11 @@ function M.reset()
   utils.notify("reset!!!!")
 end
 
-function M.setKeyMaps()
-  vim.keymap.set("n", "<leader>nk", function()
-    M.prev_field()
-  end)
-  vim.keymap.set("n", "<leader>nj", function()
-    M.next_field()
-  end)
-  vim.keymap.set("n", "<leader>ns", function()
-    M.write()
-  end)
-  vim.keymap.set("n", "<leader>nr", function()
-    M.reset()
-  end)
-  vim.keymap.set("n", "<leader>ni", function()
-    M.pasteimage()
-  end)
-  vim.keymap.set("n", "<leader>ng", function()
-    M.sendtogui()
-  end)
-  vim.keymap.set("n", "<leader>no", function()
-    M.guiDeckOverview()
-  end)
-  utils.notify("key maps set!")
-end
-
-function M.remKeyMaps()
-  vim.keymap.del("n", "<leader>nk")
-  vim.keymap.del("n", "<leader>nj")
-  vim.keymap.del("n", "<leader>ns")
-  vim.keymap.del("n", "<leader>nr")
-  vim.keymap.del("n", "<leader>ni")
-  vim.keymap.del("n", "<leader>ng")
-  vim.keymap.del("n", "<leader>no")
-  utils.notify("key maps removed!")
-end
-
 function M.pasteimage()
   local e = current_editor()
   if e then
-    local image = select.SelectImage()
-    e:add_image(image.name, image.path)
-    vim.api.nvim_put({
-      image_formatting(image.name),
-    }, "l", true, true)
+    select.SelectImage(e)
   end
-  -- utils.notify("image sent to anki!")
 end
 
 function M.guiDeckOverview()
@@ -157,11 +115,149 @@ function M.guiDeckOverview()
   end
 end
 
+function M.reset_fields()
+  local e = current_editor()
+  if e then
+    e:reset_fields()
+    utils.notify("Fields reset (except locked field)")
+  end
+end
+
+function M.lock_current_field()
+  local e = current_editor()
+  if e then
+    local current_win = api.nvim_get_current_win()
+    for field_name, field in pairs(e.fields) do
+      if field.win == current_win then
+        e:lock_field(field_name)
+        utils.notify("Field '" .. field_name .. "' locked")
+        return
+      end
+    end
+    utils.notify("No field selected")
+  end
+end
+
+function M.unlock_field()
+  local e = current_editor()
+  if e then
+    e:unlock_field()
+    utils.notify("Field unlocked")
+  end
+end
+
+local keymaps = {
+  {
+    mode = "n",
+    lhs = "<leader>nk",
+    rhs = function()
+      M.prev_field()
+    end,
+    opts = { desc = "Go to previous field" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>nj",
+    rhs = function()
+      M.next_field()
+    end,
+    opts = { desc = "Go to next field" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>ns",
+    rhs = function()
+      M.write()
+    end,
+    opts = { desc = "Save card" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>nr",
+    rhs = function()
+      M.reset()
+    end,
+    opts = { desc = "Reset editor" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>nf",
+    rhs = function()
+      M.reset_fields()
+    end,
+    opts = { desc = "Reset editor fields" },
+  },
+
+  {
+    mode = "n",
+    lhs = "<leader>nl",
+    rhs = function()
+      M.lock_current_field()
+    end,
+    opts = { desc = "Lock the current field" },
+  },
+
+  {
+    mode = "n",
+    lhs = "<leader>nu",
+    rhs = function()
+      M.unlock_field()
+    end,
+    opts = { desc = "Unlock the current field" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>ni",
+    rhs = function()
+      M.pasteimage()
+    end,
+    opts = { desc = "Paste image" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>ng",
+    rhs = function()
+      M.sendtogui()
+    end,
+    opts = { desc = "Send to Anki GUI" },
+  },
+  {
+    mode = "n",
+    lhs = "<leader>no",
+    rhs = function()
+      M.guiDeckOverview()
+    end,
+    opts = { desc = "Open Anki deck overview" },
+  },
+}
+
+function M.setKeyMaps()
+  for _, keymap in ipairs(keymaps) do
+    vim.keymap.set(keymap.mode, keymap.lhs, keymap.rhs, keymap.opts)
+  end
+  utils.notify("Key maps set!")
+end
+
+function M.remKeyMaps()
+  for _, keymap in ipairs(keymaps) do
+    vim.keymap.del(keymap.mode, keymap.lhs)
+  end
+  utils.notify("Key maps removed!")
+end
+
 function M.setup_highlights()
-  api.nvim_set_hl(0, "AnkiHeaderTitle", { fg = "#0aafdd", bold = true })
-  api.nvim_set_hl(0, "AnkiHeaderBorder", { fg = "#a1ffdd" })
-  api.nvim_set_hl(0, "AnkiFieldTitle", { fg = "#afdfdd", bold = true })
-  api.nvim_set_hl(0, "AnkiFieldBorder", { fg = "#a1aadd" })
+  local highlights = {
+    AnkiHeaderTitle = { fg = "#0aafdd", bold = true },
+    AnkiHeaderBorder = { fg = "#a1ffdd" },
+    AnkiFieldTitle = { fg = "#afdfdd", bold = true },
+    AnkiFieldBorder = { fg = "#a1aadd" },
+    AnkiFieldTitleLocked = { fg = "#d03311", bold = true },
+    AnkiFieldBorderLocked = { fg = "#d03311" },
+  }
+
+  for name, opts in pairs(highlights) do
+    api.nvim_set_hl(0, name, opts)
+  end
 end
 
 function M.add_note(model, deck)
