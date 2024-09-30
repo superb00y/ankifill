@@ -12,7 +12,7 @@ Editor.bufopts = {
   buftype = "nofile",
   modifiable = true,
   filetype = "html",
-  syntax = "html",
+  syntax = "html.css",
   bufhidden = "wipe",
 }
 
@@ -30,7 +30,7 @@ local function mk_header(deck)
   local buf = api.nvim_create_buf(false, true)
   api.nvim_set_option_value("buftype", "nofile", { buf = buf })
   api.nvim_set_option_value("bufhidden", "wipe", { buf = buf })
-  api.nvim_buf_set_lines(buf, 0, -1, true, { " ● Deck:" .. deck })
+  api.nvim_buf_set_lines(buf, 0, -1, true, { "   Deck:" .. deck })
   api.nvim_set_option_value("modifiable", false, { buf = buf })
   api.nvim_buf_attach(buf, false, {})
   local properties = {
@@ -169,7 +169,8 @@ function Editor:get_fields_contents()
   local fields = {}
   for _, field in ipairs(self.model.editor_fields_order) do
     local lines = api.nvim_buf_get_lines(self.fields[field].buf, 0, -1, true)
-    fields[field] = table.concat(lines, "<br>\n")
+    -- fields[field] = table.concat(lines, "<br>\n")
+    fields[field] = table.concat(lines, "")
   end
   return fields
 end

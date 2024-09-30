@@ -63,7 +63,7 @@ Select.SelectImage = function(e)
     "f",
     "--regex",
     [[.*.(]] .. table.concat(filetypes, "|") .. [[)$]],
-    search_dir,
+    -- search_dir,
   }
 
   local attach_mappings = function(prompt_bufnr, _)
@@ -71,7 +71,7 @@ Select.SelectImage = function(e)
       local selection = action_state.get_selected_entry()
       actions.close(prompt_bufnr)
       local name = selection.value:match("([^/]+)$")
-      local path = selection.value
+      local path = search_dir .. "/" .. selection.value
       e:add_image(name, path)
       vim.api.nvim_put({
         image_formatting(name),
@@ -84,6 +84,7 @@ Select.SelectImage = function(e)
     prompt_title = "image files",
     finder = finders.new_oneshot_job(fd, opts),
     attach_mappings = attach_mappings,
+    sorter = sorters.get_fuzzy_file(opts),
   })
 
   picker:find()
