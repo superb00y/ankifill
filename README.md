@@ -1,6 +1,6 @@
 # Ankifill.nvim
 
-![Ankifill Screenshot](/ankifill_screenshot.png)
+![Ankifill Screenshot](./images/anki-screenshot.png)
 
 Ankifill is a Neovim plugin that allows you to create Anki cards directly from your editor.
 
