@@ -1,6 +1,6 @@
-# Ankifill.nvim
+# Ankifill
 
-![Ankifill Screenshot](./images/ankifill_screenshot.png)
+![Ankifill Screenshot](.images/ankifill_screenshot.png)
 
 Ankifill is a Neovim plugin that allows you to create Anki cards directly from your editor.
 
@@ -63,18 +63,18 @@ Consider using:
 
 Ankifill provides the following keybindings by default:
 
-| Keybinding   | Description             |
-| ------------ | ----------------------- |
-| `<leader>nk` | Go to previous field    |
-| `<leader>nj` | Go to next field        |
-| `<leader>ns` | Save card               |
-| `<leader>nr` | Reset editor            |
-| `<leader>ni` | Paste image             |
-| `<leader>ng` | Send to Anki GUI        |
-| `<leader>no` | Open Anki deck overview |
-| `<leader>nf` | Reset fields            |
-| `<leader>nl` | Lock current field      |
-| `<leader>nu` | Unlock field            |
+| Keybinding          | Description             |
+| ------------        | ----------------------- |
+| `<leader>nk`        | Go to previous field    |
+| `<leader>nj`        | Go to next field        |
+| `<leader>ns`        | Save card               |
+| `<leader>nr`        | Reset editor            |
+| `<leader>ni`        | Paste image             |
+| `<leader>ng`        | Send to Anki GUI        |
+| `<leader>no`        | Open Anki deck overview |
+| `<leader>nf`        | Reset fields            |
+| `<leader>nl`        | Lock current field      |
+| `<leader>nu` |        Unlock field            |
 
 To start creating a new Anki card, use the command `:Anki`.
 
