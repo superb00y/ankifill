@@ -170,7 +170,7 @@ function Editor:get_fields_contents()
   for _, field in ipairs(self.model.editor_fields_order) do
     local lines = api.nvim_buf_get_lines(self.fields[field].buf, 0, -1, true)
     -- fields[field] = table.concat(lines, "<br>\n")
-    fields[field] = table.concat(lines, "")
+    fields[field] = table.concat(lines, "\n")
   end
   return fields
 end
