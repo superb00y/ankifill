@@ -81,11 +81,11 @@ Consider using:
 
 Here's what am planning for future releases of AnkiFill:
 
-- [] Support for cloze deletions
-- [] Custom card templates
-- [] Support for audio attachments
-- [] Better image preview and insertion
-- [] Custom keybindings
+- [ ] Support for cloze deletions
+- [ ] Custom card templates
+- [ ] Support for audio attachments
+- [ ] Better image preview and insertion
+- [ ] Custom keybindings
 
 ## Contributing
 
