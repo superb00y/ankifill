@@ -51,6 +51,24 @@ Here's an example configuration:
 }
 ```
 
+## Usage
+
+- To start creating a new Anki card, use the command `:Anki`.
+- Ankifill provides the following keybindings by default:
+
+| Keybinding   | Description             |
+| ------------ | ----------------------- |
+| `<leader>nk` | Go to previous field    |
+| `<leader>nj` | Go to next field        |
+| `<leader>ns` | Save card               |
+| `<leader>nr` | Reset editor            |
+| `<leader>ni` | Paste image             |
+| `<leader>ng` | Send to Anki GUI        |
+| `<leader>no` | Open Anki deck overview |
+| `<leader>nf` | Reset fields            |
+| `<leader>nl` | Lock current field      |
+| `<leader>nu` | Unlock field            |
+
 ### Recommended Plugins
 
 Consider using:
@@ -59,34 +77,15 @@ Consider using:
 2. [which-key.nvim](https://github.com/folke/which-key.nvim) for keybinding hints
 3. [icon-picker.nvim](https://github.com/ziontee113/icon-picker.nvim) for symbol insertion
 
-## Usage
-
-Ankifill provides the following keybindings by default:
-
-| Keybinding          | Description             |
-| ------------        | ----------------------- |
-| `<leader>nk`        | Go to previous field    |
-| `<leader>nj`        | Go to next field        |
-| `<leader>ns`        | Save card               |
-| `<leader>nr`        | Reset editor            |
-| `<leader>ni`        | Paste image             |
-| `<leader>ng`        | Send to Anki GUI        |
-| `<leader>no`        | Open Anki deck overview |
-| `<leader>nf`        | Reset fields            |
-| `<leader>nl`        | Lock current field      |
-| `<leader>nu` |        Unlock field            |
-
-To start creating a new Anki card, use the command `:Anki`.
-
 ## TODO
 
-Here's what we're planning for future releases of AnkiFill:
+Here's what am planning for future releases of AnkiFill:
 
-- Support for cloze deletions
-- Custom card templates
-- Support for audio attachments
-- Better image preview and insertion
-- Custom keybindings
+- [] Support for cloze deletions
+- [] Custom card templates
+- [] Support for audio attachments
+- [] Better image preview and insertion
+- [] Custom keybindings
 
 ## Contributing
 
