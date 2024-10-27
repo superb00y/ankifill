@@ -88,7 +88,7 @@ Select.SelectImage = function(e)
 
 	local function get_image_sorter(opts)
 		return sorters.new({
-			scoring_function = function(_, line)
+			scoring_function = function(_, prompt, line)
 				local path = opts.cwd .. "/" .. line
 				local modification_time = vim.loop.fs_stat(path).mtime.sec
 				return -modification_time
